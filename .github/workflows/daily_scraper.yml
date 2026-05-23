@@ -1,45 +1,45 @@
-name: Daily CaseCiter Scraper
+name: Daily CrPC CaseCiter Scraper
 
 on:
   schedule:
-    # Runs everyday at 08:00 AM UTC (adjust as needed)
-    - cron: '0 8 * * *'
-  workflow_dispatch: # Allows you to manually trigger the workflow from GitHub UI
+    # Runs everyday at 09:00 AM UTC (2:30 PM IST)
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allows manual trigger execution from the GitHub website
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Important: Allows workflow to save history.json back to repo
+      contents: write # Grants GitHub permission to update and save history.json
 
     steps:
-    - name: Check out repository
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-python: '3.10'
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Scraper
+    - name: Execute Scraper
       env:
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: python scraper.py
 
-    - name: Commit and push changes if history updated
+    - name: Save Tracking History
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add history.json
         if git diff --staged --quiet; then
-          echo "No new updates added to history."
+          echo "No new updates found to commit."
         else
-          git commit -m "Automated: Update history.json with new scraped cases"
+          git commit -m "Automated: Updated history logs with newly parsed CrPC cases"
           git push
         fi
